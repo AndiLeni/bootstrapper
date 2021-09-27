@@ -3,27 +3,56 @@
 if (rex_request_method() == 'get') {
 
     $packagesFromInstaller = rex_install_packages::getAddPackages();
+    // dump($packagesFromInstaller);
 
     $names = array_keys($packagesFromInstaller);
+    // dump($names);
 
     $content = '<p>Addons filtern:</p>';
     $content .= '<input id="filterInput" class="form-control" type="text">';
     $content .= '<hr>';
     $content .= '<form method="POST">';
-    $content .= '<ul id="items" style="list-style: none;">';
+    // $content .= '<ul id="items" style="list-style: none;">';
+    $content .= '<table class="table" id="items">';
+    $content .= '<tr>';
+    $content .= '<th>';
+    $content .= 'Installieren';
+    $content .= '</th>';
+    $content .= '<th>';
+    $content .= 'Key';
+    $content .= '</th>';
+    $content .= '<th>';
+    $content .= 'Name / Autor';
+    $content .= '</th>';
+    $content .= '<th>';
+    $content .= 'Veröffentlicht';
+    $content .= '</th>';
+    $content .= '<th>';
+    $content .= 'Beschreibung';
+    $content .= '</th>';
+    $content .= '</tr>';
 
 
 
 
-    foreach ($names as $addon) {
-        $content .= '<li>';
-        $content .= '<div>';
-        $content .= '<input style="margin-right: 10px" type="checkbox" id="' . $addon . '" name="packages[]" value="' . $addon . '">';
-        $content .= '<label for="' . $addon . '">' . $addon . '</label>';
-        $content .= '</div>';
-        $content .= '</li>';
+    foreach ($packagesFromInstaller as $key => $addon) {
+        // $content .= '<li>';
+        // $content .= '<div>';
+        // $content .= '<input style="margin-right: 10px" type="checkbox" id="' . $addon . '" name="packages[]" value="' . $addon . '">';
+        // $content .= '<label for="' . $addon . '">' . $addon . '</label>';
+        // $content .= '</div>';
+        // $content .= '</li>';
+        $content .= '<tr>';
+        $content .= '<td><input style="margin-right: 10px" type="checkbox" id="table-item-' . $key . '" name="packages[]" value="' . $key . '"></td>';
+        $content .= '<td><label for="table-item-' . $key . '">' . $key . '</label></td>';
+        $content .= '<td>'. $addon['name'] .' <br> '. $addon['author'] .'</td>';
+        $content .= '<td>'. $addon['updated'] .'</td>';
+        $content .= '<td>'. $addon['shortdescription'] .'</td>';
+        $content .= '</tr>';
+        
     }
 
+    $content .= '</table>';
     $content .= '<button type="submit" class="btn btn-primary">Installieren</button>';
     $content .= '</form>';
 
@@ -120,7 +149,7 @@ if (rex_request_method() == 'get') {
 
 ?>
 
-</ul>
+<!-- </ul> -->
 
 <script>
     // Get input element
@@ -134,13 +163,18 @@ if (rex_request_method() == 'get') {
 
         // Get names ul
         let ul = document.getElementById('items');
+        // console.log(ul)
         // Get lis from ul
-        let li = ul.querySelectorAll('li');
+        // let li = ul.querySelectorAll('li');
+        let li = ul.querySelectorAll('tr');
+        // li.shift()
         // console.log(li)
 
         // Loop through collection-item lis
-        for (let i = 0; i < li.length; i++) {
+        for (let i = 1; i < li.length; i++) {
             let a = li[i].getElementsByTagName('label')[0];
+            // console.log(a.innerHTML)
+            // console.log(li[i])
             // If matched
             if (a.innerHTML.toUpperCase().indexOf(filterValue) > -1) {
                 li[i].style.display = '';
