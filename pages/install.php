@@ -1,43 +1,35 @@
 <?php
 
-// $a = new Node('a');
-// $b = new Node('b');
-// $c = new Node('c');
-// $d = new Node('d');
-// $e = new Node('e');
+
+if (rex_request_method() == 'get') {
+
+    $form = '<p>Hier bitte zeilenweise ein Addon zur Installation eintragen:</p>';
+    $form .= '<form method="POST">';
+    $form .= '<div class="form-group">';
+    $form .= '<textarea class="form-control" name="packages" rows="20"></textarea>';
+    $form .= '</div>';
+    $form .= '<button type="submit" class="btn btn-primary">Installieren</button>';
+    $form .= '</form>';
 
 
-// $a->addEdge($b);    # a depends on b
-// $a->addEdge($d);
-// $b->addEdge($c);
-// $b->addEdge($e);
-// $c->addEdge($d);
-// $c->addEdge($e);
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'edit', false);
+    $fragment->setVar('title', 'Addons installieren');
+    $fragment->setVar('body', $form, false);
+    echo $fragment->parse('core/page/section.php');
+} elseif (rex_request_method() == 'post') {
 
-
-// $solver = new Solver();
-
-// $solver->dep_resolve($a);
-
-
-?>
-
-<!-- <h1>Installation order:</h1>
-<ol>
-
-    <?php
-    foreach ($solver->resolved as $node) {
-        echo '<li>';
-        echo $node->name;
-        echo '</li>';
+    $packages = rex_post('packages', 'string', '');
+    
+    if ($packages == '') {
+        echo rex_view::error('Keine Pakete angegeben.');
+    } else {
+        $packages_to_install = explode("\n", str_replace("\r", "", $packages));
     }
+    dump($packages_to_install);
 
-    ?>
+}
 
-</ol> -->
-
-
-<?php
 
 $packages_to_install = ['forcal', 'watson', 'mform', 'mblock', 'yrewrite', 'yform', 'yform_spam_protection', 'yrewrite_scheme', 'adminer', 'uikit_collection'];
 
