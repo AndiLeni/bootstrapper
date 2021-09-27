@@ -88,7 +88,8 @@ if (rex_request_method() == 'get') {
 
         // echo 'Installing and activating addon ' . $addon->name . '<br>';
         $package = rex_package::get($addon->name);
-        $am = rex_addon_manager::factory($package);
+        // $am = rex_addon_manager::factory($package);
+        $am = rex_package_manager::factory($package);
 
         $am->install();
         $activated = $am->activate();

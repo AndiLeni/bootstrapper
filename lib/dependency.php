@@ -66,7 +66,8 @@ class Dependency
             dump($deps);
 
             foreach ($deps as $dep) {
-                $a = rex_addon::get($dep);
+                // $a = rex_addon::get($dep);
+                $a = rex_package::get($dep);
                 // dump($a);
                 // dump($a->isAvailable());
 
