@@ -9,6 +9,8 @@ page:
   subpages:
     install:
       title: Installation
+    delete:
+      title: Deinstallieren
 
 requires:
   redaxo: '^5.11'

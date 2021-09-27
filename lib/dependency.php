@@ -30,6 +30,11 @@ class Dependency
     {
         if (!rex_addon::exists($addon)) {
             $filekey = $this->get_key($this->packagesFromInstaller, $addon);
+
+            if ($filekey == null) {
+                return;
+            }
+
             $version = $this->packagesFromInstaller[$addon]['files'][$filekey]['version'];
 
             echo 'Downloading addon ' . $addon . ' in version ' . $version . '<br>';
@@ -46,6 +51,10 @@ class Dependency
         }
 
         $this->versions[$addon] = $this->get_version($addon);
+
+        if (!isset($this->nodes[$addon])) {
+            $this->nodes[$addon] = new Node($addon);
+        }
 
         echo '<h4>Dependencies for ' . $addon . ':</h4>';
 
@@ -99,5 +108,6 @@ class Dependency
             }
         }
         echo rex_view::error('No released version for addon ' . $addon);
+        return null;
     }
 }
