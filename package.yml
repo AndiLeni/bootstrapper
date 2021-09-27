@@ -11,6 +11,8 @@ page:
       title: Installation
     delete:
       title: Deinstallieren
+    installer:
+      title: Installer
 
 requires:
   redaxo: '^5.11'
