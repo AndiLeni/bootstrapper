@@ -9,6 +9,8 @@ page:
   subpages:
     install:
       title: Installation
+    upload:
+      title: Installation aus Datei
     installer:
       title: Installer
 
