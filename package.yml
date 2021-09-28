@@ -9,8 +9,6 @@ page:
   subpages:
     install:
       title: Installation
-    delete:
-      title: Deinstallieren
     installer:
       title: Installer
 

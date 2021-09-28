@@ -2,6 +2,8 @@
 
 if (rex_request_method() == 'get') {
 
+    echo rex_view::info('Hinweis: dieser Installer installiert die neueste nicht-beta Version eines Addons. Nutzen Sie den Installer für spezifische Versionen.');
+
     $packagesFromInstaller = rex_install_packages::getAddPackages();
     // dump($packagesFromInstaller);
 
@@ -9,11 +11,15 @@ if (rex_request_method() == 'get') {
     // dump($names);
 
     $content = '<p>Addons filtern:</p>';
-    $content .= '<input id="filterInput" class="form-control" type="text">';
+    $content .= '<div class="input-group">';
+    $content .= '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+    $content .= '<input id="filterInput" type="text" class="form-control">';
+    $content .= '<span class="input-group-btn"><button id="bootstrapper_clear_input_filter" class="btn btn-default" type="button"><i class="fa fa-times"></i></button></span>';
+    $content .= '</div>';
     $content .= '<hr>';
     $content .= '<form method="POST">';
     // $content .= '<ul id="items" style="list-style: none;">';
-    $content .= '<table class="table" id="items">';
+    $content .= '<table class="table table-striped table-hover" id="items">';
     $content .= '<tr>';
     $content .= '<th>';
     $content .= 'Installieren';
@@ -30,26 +36,53 @@ if (rex_request_method() == 'get') {
     $content .= '<th>';
     $content .= 'Beschreibung';
     $content .= '</th>';
+    $content .= '<th>';
+    $content .= 'Status';
+    $content .= '</th>';
     $content .= '</tr>';
 
 
 
 
     foreach ($packagesFromInstaller as $key => $addon) {
+
+        $published = DateTime::createFromFormat('Y-m-d H:i:s', $addon['updated']);
+
+        $p = rex_package::get($addon['name']);
+        if (!$p->isAvailable()) {
+            $content .= '<tr>';
+            $content .= '<td><input style="margin-right: 10px" type="checkbox" id="table-item-' . $key . '" name="packages[]" value="' . $key . '"></td>';
+            $content .= '<td><label for="table-item-' . $key . '">' . $key . '</label></td>';
+            $content .= '<td><b>' . $addon['name'] . ' </b><br> ' . $addon['author'] . '</td>';
+            $content .= '<td>' . $published->format('d.m.Y') . '</td>';
+            $content .= '<td>' . $addon['shortdescription'] . '</td>';
+            $content .= '<td><i class="fa fa-times text-danger fa-2x" aria-hidden="true"></i></td>';
+            $content .= '</tr>';
+        } else {
+            $content .= '<tr>';
+            $content .= '<td><input disabled style="margin-right: 10px" type="checkbox" id="table-item-' . $key . '" name="packages[]" value="' . $key . '"></td>';
+            $content .= '<td><label for="table-item-' . $key . '">' . $key . '</label></td>';
+            $content .= '<td><b>' . $addon['name'] . ' </b><br> ' . $addon['author'] . '</td>';
+            $content .= '<td>' . $published->format('d.m.Y') . '</td>';
+            $content .= '<td>' . $addon['shortdescription'] . '</td>';
+            $content .= '<td><i class="fa fa-check text-success fa-2x" aria-hidden="true"></i></td>';
+            $content .= '</tr>';
+        }
+
+
         // $content .= '<li>';
         // $content .= '<div>';
         // $content .= '<input style="margin-right: 10px" type="checkbox" id="' . $addon . '" name="packages[]" value="' . $addon . '">';
         // $content .= '<label for="' . $addon . '">' . $addon . '</label>';
         // $content .= '</div>';
         // $content .= '</li>';
-        $content .= '<tr>';
-        $content .= '<td><input style="margin-right: 10px" type="checkbox" id="table-item-' . $key . '" name="packages[]" value="' . $key . '"></td>';
-        $content .= '<td><label for="table-item-' . $key . '">' . $key . '</label></td>';
-        $content .= '<td>'. $addon['name'] .' <br> '. $addon['author'] .'</td>';
-        $content .= '<td>'. $addon['updated'] .'</td>';
-        $content .= '<td>'. $addon['shortdescription'] .'</td>';
-        $content .= '</tr>';
-        
+        // $content .= '<tr>';
+        // $content .= '<td><input style="margin-right: 10px" type="checkbox" id="table-item-' . $key . '" name="packages[]" value="' . $key . '"></td>';
+        // $content .= '<td><label for="table-item-' . $key . '">' . $key . '</label></td>';
+        // $content .= '<td><b>' . $addon['name'] . ' </b><br> ' . $addon['author'] . '</td>';
+        // $content .= '<td>' . $published->format('d.m.Y') . '</td>';
+        // $content .= '<td>' . $addon['shortdescription'] . '</td>';
+        // $content .= '</tr>';
     }
 
     $content .= '</table>';
@@ -153,6 +186,13 @@ if (rex_request_method() == 'get') {
 <!-- </ul> -->
 
 <script>
+    var clear_filter_btn = document.getElementById('bootstrapper_clear_input_filter')
+
+    clear_filter_btn.addEventListener('click', function(e) {
+        filterInput.value = '';
+        filterNames()
+    })
+
     // Get input element
     let filterInput = document.getElementById('filterInput');
     // Add event listener
