@@ -8,6 +8,7 @@ class Dependency
     public array $packages_to_install;
     public array $versions = [];
     public array $nodes = [];
+    public bool $no_downloadable_version_found = false;
 
 
     public function __construct(array $packagesFromInstaller, array $packages_to_install)
@@ -28,7 +29,8 @@ class Dependency
 
     function get_dependencies(String $addon)
     {
-        if (!rex_addon::exists($addon)) {
+        if (!rex_package::exists($addon)) {
+
             $filekey = $this->get_key($this->packagesFromInstaller, $addon);
 
             if ($filekey == null) {
@@ -50,7 +52,10 @@ class Dependency
             // }
         }
 
-        $this->versions[$addon] = $this->get_version($addon);
+        if (!str_contains($addon, '/')) {
+            $this->versions[$addon] = $this->get_version($addon);
+        }
+
 
         if (!isset($this->nodes[$addon])) {
             $this->nodes[$addon] = new Node($addon);
@@ -71,8 +76,39 @@ class Dependency
                 // dump($a);
                 // dump($a->isAvailable());
 
+                // dump('======================================');
+                // dump($dep);
+                // dump(str_contains($dep, '/'));
+                // dump(explode('/', $dep)[0]);
+                // dump('======================================');
+
                 if (!($a->isAvailable())) {
                     // echo $addon;
+
+                    // check if dependency is plugin
+                    // f.e. $dep = "structure/content"
+                    // if dependency is plugin, link addon to plugin and check addon for dependencies
+                    if (str_contains($dep, '/')) {
+
+                        // f.e. "structure" from "structure/content"
+                        $plugin_addon = explode('/', $dep)[0];
+
+                        if (!isset($this->nodes[$dep])) {
+                            $this->nodes[$dep] = new Node($dep);
+                        }
+
+                        if (!isset($this->nodes[$plugin_addon])) {
+                            $this->nodes[$plugin_addon] = new Node($plugin_addon);
+                        }
+
+                        $this->nodes[$dep]->addEdge($this->nodes[$plugin_addon]);  # addon depends on dependency
+
+                        if (!in_array($plugin_addon, $this->packages_to_install)) {
+                            array_push($this->packages_to_install, $plugin_addon);
+                        }
+
+                        $this->get_dependencies($plugin_addon);
+                    }
 
 
                     if (!isset($this->nodes[$addon])) {
@@ -98,6 +134,10 @@ class Dependency
 
     function get_key($packagesFromInstaller, $addon)
     {
+        if (str_contains($addon, '/')) {
+            return;
+        }
+
         $filekeys = array_keys($packagesFromInstaller[$addon]['files']);
         // dump($filekeys);
 
@@ -108,6 +148,7 @@ class Dependency
                 return $key;
             }
         }
+        $this->no_downloadable_version_found = true;
         echo rex_view::error('No released version for addon ' . $addon);
         return null;
     }

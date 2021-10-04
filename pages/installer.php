@@ -161,6 +161,12 @@ if (rex_request_method() == 'get') {
     echo '</table>';
 
 
+    if ($dependency_manager->no_downloadable_version_found) {
+        echo rex_view::error('Installation aborted because one addon could not be found');
+        exit();
+    }
+
+
     foreach ($solver->resolved as $addon) {
 
         // echo 'Installing and activating addon ' . $addon->name . '<br>';
