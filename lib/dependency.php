@@ -39,7 +39,7 @@ class Dependency
 
             $version = $this->packagesFromInstaller[$addon]['files'][$filekey]['version'];
 
-            echo 'Downloading addon ' . $addon . ' in version ' . $version . '<br>';
+            // echo 'Downloading addon ' . $addon . ' in version ' . $version . '<br>';
 
             // $this->versions[$addon] = $version;
 
@@ -54,6 +54,8 @@ class Dependency
 
         if (!str_contains($addon, '/')) {
             $this->versions[$addon] = $this->get_version($addon);
+        } else {
+            $this->versions[$addon] = 'is plugin';
         }
 
 
@@ -61,14 +63,14 @@ class Dependency
             $this->nodes[$addon] = new Node($addon);
         }
 
-        echo '<h4>Dependencies for ' . $addon . ':</h4>';
+        // echo '<h4>Dependencies for ' . $addon . ':</h4>';
 
         $package = rex_package::get($addon);
         $deps = $package->getProperty('requires');
 
         if (isset($deps['packages'])) {
             $deps = array_keys($deps['packages']);
-            dump($deps);
+            // dump($deps);
 
             foreach ($deps as $dep) {
                 // $a = rex_addon::get($dep);
@@ -93,21 +95,28 @@ class Dependency
                         // f.e. "structure" from "structure/content"
                         $plugin_addon = explode('/', $dep)[0];
 
-                        if (!isset($this->nodes[$dep])) {
-                            $this->nodes[$dep] = new Node($dep);
+                        $p = rex_package::get($plugin_addon);
+                        if (!($p->isAvailable())) {
+                            if (!in_array($plugin_addon, $this->packages_to_install)) {
+                                array_push($this->packages_to_install, $plugin_addon);
+                            }
+                            if (!isset($this->nodes[$dep])) {
+                                $this->nodes[$dep] = new Node($dep);
+                            }
+
+                            if (!isset($this->nodes[$plugin_addon])) {
+                                $this->nodes[$plugin_addon] = new Node($plugin_addon);
+                            }
+
+                            $this->nodes[$dep]->addEdge($this->nodes[$plugin_addon]);  # addon depends on dependency
+
+
+                            // if (!in_array($plugin_addon, $this->packages_to_install)) {
+                            //     array_push($this->packages_to_install, $plugin_addon);
+                            // }
+
+                            $this->get_dependencies($plugin_addon);
                         }
-
-                        if (!isset($this->nodes[$plugin_addon])) {
-                            $this->nodes[$plugin_addon] = new Node($plugin_addon);
-                        }
-
-                        $this->nodes[$dep]->addEdge($this->nodes[$plugin_addon]);  # addon depends on dependency
-
-                        if (!in_array($plugin_addon, $this->packages_to_install)) {
-                            array_push($this->packages_to_install, $plugin_addon);
-                        }
-
-                        $this->get_dependencies($plugin_addon);
                     }
 
 
