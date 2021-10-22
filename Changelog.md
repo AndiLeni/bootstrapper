@@ -1,6 +1,6 @@
 # Changelog
 
-## [x] - xx.xx.xxxx
+## [1.0.0-alpha.2] - 22.10.2021
 
 ### Added
 
