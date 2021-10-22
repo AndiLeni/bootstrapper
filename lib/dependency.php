@@ -3,12 +3,12 @@
 class Dependency
 {
 
-    public String $addon;
-    public array $packagesFromInstaller;
-    public array $packages_to_install;
-    public array $versions = [];
-    public array $nodes = [];
-    public bool $no_downloadable_version_found = false;
+    public $addon;
+    public $packagesFromInstaller;
+    public $packages_to_install;
+    public $versions = [];
+    public $nodes = [];
+    public $no_downloadable_version_found = false;
 
 
     public function __construct(array $packagesFromInstaller, array $packages_to_install)
