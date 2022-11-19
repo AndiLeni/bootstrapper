@@ -1,7 +1,7 @@
 <?php
 
 // show which addons were selected for installation
-echo '<h2>Ausgewählte Addons:</h2>';
+echo '<h3>Ausgewählte Addons:</h3>';
 echo '<ul>';
 foreach ($packages_to_install as $package) {
     echo '<li>';
@@ -10,8 +10,6 @@ foreach ($packages_to_install as $package) {
 }
 echo '</ul>';
 
-
-// $packages_to_install = ['forcal', 'watson', 'mform', 'mblock', 'yrewrite', 'yform', 'yform_spam_protection', 'yrewrite_scheme', 'adminer', 'uikit_collection'];
 
 // keep track of installed versions
 $versions = [];
@@ -36,8 +34,7 @@ foreach ($packages_to_install as $addon) {
 
 
 
-echo '<h2>Pakete zum installieren:</h2>';
-// dump($packages_to_install);
+echo '<h3>Abhängigkeiten die installiert werden müssen:</h3>';
 echo '<ul>';
 foreach ($packages_to_install as $package) {
     echo '<li>';
@@ -47,21 +44,24 @@ foreach ($packages_to_install as $package) {
 echo '</ul>';
 
 
+function make_text_graph($nodes)
+{
+    echo '<ul>';
+    foreach ($nodes as $node) {
+        if ($node->edges == []) {
+            echo '<li>' . $node->name . "</li>";
+        } else {
+            echo '<li>' . $node->name . "</li>";
+            make_text_graph($node->edges);
+        }
+    }
+    echo '</ul>';
+}
 
-echo '<h2>Abhängigkeitsgraph:</h2>';
-dump($dependency_manager->nodes);
+echo '<h3>Abhängigkeitsgraph:</h3>';
+make_text_graph($dependency_manager->nodes);
 
 
-
-// echo '<h2>Versionen:</h2>';
-// // dump($dependency_manager->versions);
-// echo '<ul>';
-// foreach ($dependency_manager->versions as $package => $version) {
-//     echo '<li>';
-//     echo $package . ' --- ' . $version;
-//     echo '</li>';
-// }
-// echo '</ul>';
 
 
 // solver for dependency resolution
@@ -73,7 +73,7 @@ foreach ($dependency_manager->nodes as $node) {
 
 
 
-echo '<h2>Installation order:</h2>';
+echo '<h3>Installation order:</h3>';
 
 echo '<table class="table table-hover">';
 echo '<tr>';
@@ -100,11 +100,9 @@ if ($dependency_manager->no_downloadable_version_found) {
 }
 
 
+// install addons and dependencies
 foreach ($solver->resolved as $addon) {
-
-    // echo 'Installing and activating addon ' . $addon->name . '<br>';
     $package = rex_package::get($addon->name);
-    // $am = rex_addon_manager::factory($package);
     $am = rex_package_manager::factory($package);
 
     $am->install();
