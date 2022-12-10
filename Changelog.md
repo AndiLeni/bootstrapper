@@ -2,6 +2,13 @@
 
 
 
+## [1.1.0] - 10.12.2022
+
+### Changes
+- add page for exporting installed addons
+
+
+
 ## [1.0.0] - 19.11.2022
 
 ### Changes
